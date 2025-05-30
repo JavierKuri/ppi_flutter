@@ -1,4 +1,6 @@
 <?php
+    session_start();
+    header("Access-Control-Allow-Origin: *");
     $host = "localhost";
     $db = "finalppi";
     $user = "root";

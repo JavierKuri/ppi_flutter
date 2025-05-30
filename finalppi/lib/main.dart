@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -28,6 +30,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> login() async {
+    final response = await http.post(
+      Uri.parse('http://localhost:8001/login.php'),
+      body: {'correo': _emailController.text, 'contra': _passwordController.text},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Success: ${data['success']}, Message: ${data['message']}');
+    } else {
+      print('Failed to send data: ${response.statusCode}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,18 +62,21 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: "Usuario"
+                    labelText: "Correo"
                   ),
                 ),
                 const SizedBox(height: 30),
                 TextField(
+                  controller: _passwordController,
+                  obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Contraseña"
                   ),
                 ),
                 const SizedBox(height: 50),
-                ElevatedButton(onPressed: (){}, child: Text("Login"))
+                ElevatedButton(onPressed: login, child: Text("Login")),
               ],
             ),
           ),
