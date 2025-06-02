@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'catalogue.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -36,16 +36,33 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> login() async {
     final response = await http.post(
       Uri.parse('http://localhost:8001/login.php'),
-      body: {'correo': _emailController.text, 'contra': _passwordController.text},
+      body: {
+        'correo': _emailController.text,
+        'contra': _passwordController.text,
+      },
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('Success: ${data['success']}, Message: ${data['message']}');
+      if (data['success'] == true) {
+        // Navigate to HomeScreen on success
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const catalogue(title: "Game Catalogue")),
+        );
+      } else {
+        // Show login failed message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])),
+        );
+      }
     } else {
-      print('Failed to send data: ${response.statusCode}');
+      // Server or network error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Server error. Please try again later.')),
+      );
     }
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
