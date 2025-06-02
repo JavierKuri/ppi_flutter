@@ -13,6 +13,15 @@ class catalogue extends StatefulWidget {
 
 class _catalogueState extends State<catalogue> {
 
+  // For BottomNavBar
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  // Function for getting games through PHP API
   Future<List<Map<String, String>>> get_games() async {
     final response = await http.get(
       Uri.parse('http://localhost:8001/get_games.php')
@@ -32,6 +41,8 @@ class _catalogueState extends State<catalogue> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
+
+      // Get and Show games in ListView
       body: FutureBuilder<List<Map<String, String>>>(
         future: get_games(),
         builder: (context, snapshot) {
@@ -57,6 +68,34 @@ class _catalogueState extends State<catalogue> {
             );
           }
         },
+      ),
+
+      // Bottom Nav Bar
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.blueGrey[900],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey[600],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Catalog',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
