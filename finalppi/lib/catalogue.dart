@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'itemPage.dart';
 
 class catalogue extends StatefulWidget {
   const catalogue({super.key, required this.title});
@@ -49,6 +50,8 @@ class _catalogueState extends State<catalogue> {
                 return ListTile(
                   title: Text(game['titulo'] ?? 'Untitled'),
                   subtitle: Text('\$ ${game['precio']}'),
+                  leading: game['portada'] != null ? Image.memory(base64Decode(game['portada']!)) : Icon(Icons.image_not_supported),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => itemPage(game: game)))
                 );
               },
             );
