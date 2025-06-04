@@ -1,3 +1,4 @@
+import 'package:finalppi/historyPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,9 +17,21 @@ class _catalogueState extends State<catalogue> {
   // For BottomNavBar
   int _selectedIndex = 0;
   void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+
     setState(() {
       _selectedIndex = index;
     });
+
+    // Handle navigation
+    if (index == 0) {
+    } else if (index == 1) {
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => historyPage(title: 'History')),
+      );
+    }
   }
 
   // Function for getting games through PHP API

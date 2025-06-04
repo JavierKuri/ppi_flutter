@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'catalogue.dart';
 
 class historyPage extends StatefulWidget {
   const historyPage({super.key, required this.title});
@@ -15,13 +16,25 @@ class _historyPageState extends State<historyPage> {
   // For BottomNavBar
   int _selectedIndex = 2;
   void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+
     setState(() {
       _selectedIndex = index;
     });
+
+    // Handle navigation
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => catalogue(title: 'Catalogue')),
+      );
+    } else if (index == 1) {
+    } else if (index == 2) {
+    }
   }
 
-  // Function for getting history through PHP API
-  Future<List<Map<String, String>>> get_history() async {
+// Function for getting history through PHP API
+Future<List<Map<String, String>>> get_history() async {
     final response = await http.get(
       Uri.parse('http://localhost:8001/get_history.php')
     );
@@ -69,7 +82,7 @@ class _historyPageState extends State<historyPage> {
       ),
 
       // Bottom Nav Bar
-      bottomNavigationBar: BottomNavigationBar(
+     bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.blueGrey[900],
         selectedItemColor: Colors.white,

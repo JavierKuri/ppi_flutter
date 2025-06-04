@@ -10,10 +10,8 @@
     }
 
     $historial = [];
-    $sql = "SELECT id_compra, titulo, precio FROM compras, juegos, usuarios WHERE compras.id_usuario = usuarios.id_usuario 
-                                                        AND compras.id_juego = juegos.id_juego
-                                                        AND usuarios.id_usuario = $_SESSION[$id_usuario]
-                                                        ORDER BY id_compra DESC;";
+
+    $sql = "SELECT titulo, precio, id_compra FROM compras, juegos WHERE compras.id_juego = juegos.id_juego ORDER BY id_compra DESC;";
     $result = mysqli_query($con, $sql);
 
     if (!$result) {
@@ -23,9 +21,6 @@
     }
 
     while ($row = mysqli_fetch_assoc($result)) {
-        if (isset($row['portada'])) {
-            $row['portada'] = base64_encode($row['portada']);
-        }
         $historial[] = $row;
     }
 
