@@ -12,7 +12,8 @@
         $result = mysqli_query($con, $sql);
 
         if ($result && mysqli_num_rows($result) > 0) {
-            $_SESSION['correo'] = $correo; 
+            $result = $result-> fetch_assoc();
+            $_SESSION['id_usuario']=$result['id_usuario'];
             echo json_encode(['success' => true, 'message' => 'Login successful']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
