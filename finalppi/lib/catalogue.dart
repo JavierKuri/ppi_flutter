@@ -1,8 +1,9 @@
-import 'package:finalppi/historyPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:finalppi/historyPage.dart';
 import 'itemPage.dart';
+import 'package:finalppi/userPage.dart';
 
 class catalogue extends StatefulWidget {
   const catalogue({super.key, required this.title});
@@ -30,6 +31,11 @@ class _catalogueState extends State<catalogue> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => historyPage(title: 'History')),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => userPage(title: 'User')),
       );
     }
   }
