@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'catalogue.dart';
 import 'globals.dart';
 import 'package:finalppi/userPage.dart';
+import 'package:finalppi/cartPage.dart';
 
 class historyPage extends StatefulWidget {
   const historyPage({super.key, required this.title});
@@ -31,6 +32,10 @@ class _historyPageState extends State<historyPage> {
         MaterialPageRoute(builder: (context) => catalogue(title: 'Catalogue')),
       );
     } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => cartPage(title: 'Cart')),
+      );
     } else if (index == 2) {
     } else {
       Navigator.pushReplacement(

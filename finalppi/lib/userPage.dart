@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:finalppi/historyPage.dart';
 import 'catalogue.dart';
 import 'globals.dart';
+import 'package:finalppi/cartPage.dart';
 
 class userPage extends StatefulWidget {
   const userPage({super.key, required this.title});
@@ -16,7 +17,7 @@ class userPage extends StatefulWidget {
 class _userPageState extends State<userPage> {
 
   // For BottomNavBar
-  int _selectedIndex = 2;
+  int _selectedIndex = 3;
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
 
@@ -31,6 +32,10 @@ class _userPageState extends State<userPage> {
         MaterialPageRoute(builder: (context) => catalogue(title: 'Catalogue')),
       );
     } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => cartPage(title: 'Cart')),
+      );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,

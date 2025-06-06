@@ -10,12 +10,12 @@
             exit;
         }
         $id_usuario = $_POST['id_usuario'] ?? '';
-        $historial = [];
+        $cart = [];
 
-        $sql = "SELECT titulo, precio, id_compra FROM compras, juegos, usuarios WHERE compras.id_usuario = usuarios.id_usuario 
-                                                        AND compras.id_juego = juegos.id_juego
+        $sql = "SELECT titulo, precio, id_carrito FROM carrito, juegos, usuarios WHERE carrito.id_usuario = usuarios.id_usuario 
+                                                        AND carrito.id_juego = juegos.id_juego
                                                         AND usuarios.id_usuario = $id_usuario
-                                                        ORDER BY id_compra DESC;";
+                                                        ORDER BY id_carrito DESC;";
         $result = mysqli_query($con, $sql);
 
         if (!$result) {
@@ -25,7 +25,7 @@
         }
 
         while ($row = mysqli_fetch_assoc($result)) {
-            $historial[] = $row;
+            $cart[] = $row;
         }
 
         if (empty($cart)) {
@@ -34,7 +34,7 @@
             exit;
         }
 
-        echo json_encode($historial);
+        echo json_encode($cart);
      } else {
         http_response_code(405);
         echo json_encode(['error' => 'Only POST method is accepted']);

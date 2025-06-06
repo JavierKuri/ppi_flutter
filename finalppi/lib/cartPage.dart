@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:finalppi/historyPage.dart';
-import 'itemPage.dart';
+import 'catalogue.dart';
+import 'globals.dart';
 import 'package:finalppi/userPage.dart';
-import 'package:finalppi/cartPage.dart';
+import 'package:finalppi/historyPage.dart';
 
-class catalogue extends StatefulWidget {
-  const catalogue({super.key, required this.title});
+class cartPage extends StatefulWidget {
+  const cartPage({super.key, required this.title});
   final String title;
 
   @override
-  State<catalogue> createState() => _catalogueState();
+  State<cartPage> createState() => _cartPageState();
 }
 
-class _catalogueState extends State<catalogue> {
+class _cartPageState extends State<cartPage> {
 
   // For BottomNavBar
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
 
@@ -27,11 +27,11 @@ class _catalogueState extends State<catalogue> {
 
     // Handle navigation
     if (index == 0) {
-    } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => cartPage(title: 'Cart')),
+        MaterialPageRoute(builder: (context) => catalogue(title: 'Catalogue')),
       );
+    } else if (index == 1) {
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
@@ -45,16 +45,19 @@ class _catalogueState extends State<catalogue> {
     }
   }
 
-  // Function for getting games through PHP API
-  Future<List<Map<String, String>>> get_games() async {
-    final response = await http.get(
-      Uri.parse('http://localhost:8001/get_games.php')
+// Function for getting history through PHP API
+Future<List<Map<String, String>>> get_cart() async {
+    final response = await http.post(
+      Uri.parse('http://localhost:8001/get_cart.php'),
+      body: {
+        'id_usuario': id_usuario
+      },
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => Map<String, String>.from(item)).toList();
     } else {
-      throw Exception('Failed to load games');
+      throw Exception('Failed to load history');
     }
   }
 
@@ -68,14 +71,14 @@ class _catalogueState extends State<catalogue> {
 
       // Get and Show games in ListView
       body: FutureBuilder<List<Map<String, String>>>(
-        future: get_games(),
+        future: get_cart(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No games found.'));
+            return Center(child: Text('No history found.'));
           } else {
             final games = snapshot.data!;
             return ListView.builder(
@@ -85,8 +88,7 @@ class _catalogueState extends State<catalogue> {
                 return ListTile(
                   title: Text(game['titulo'] ?? 'Untitled'),
                   subtitle: Text('\$ ${game['precio']}'),
-                  leading: game['portada'] != null ? Image.memory(base64Decode(game['portada']!)) : Icon(Icons.image_not_supported),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => itemPage(game: game)))
+                  leading: Text(game['id_carrito']!),
                 );
               },
             );
@@ -95,7 +97,7 @@ class _catalogueState extends State<catalogue> {
       ),
 
       // Bottom Nav Bar
-      bottomNavigationBar: BottomNavigationBar(
+     bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.blueGrey[900],
         selectedItemColor: Colors.white,
