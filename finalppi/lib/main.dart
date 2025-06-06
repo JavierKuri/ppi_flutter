@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'catalogue.dart';
+import 'globals.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -45,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['success'] == true) {
+        id_usuario = data['id_usuario'];
         // Navigate to HomeScreen on success
         Navigator.pushReplacement(
           context,

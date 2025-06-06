@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'catalogue.dart';
+import 'globals.dart';
 
 class historyPage extends StatefulWidget {
   const historyPage({super.key, required this.title});
@@ -35,8 +36,11 @@ class _historyPageState extends State<historyPage> {
 
 // Function for getting history through PHP API
 Future<List<Map<String, String>>> get_history() async {
-    final response = await http.get(
-      Uri.parse('http://localhost:8001/get_history.php')
+    final response = await http.post(
+      Uri.parse('http://localhost:8001/get_history.php'),
+      body: {
+        'id_usuario': id_usuario
+      },
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
