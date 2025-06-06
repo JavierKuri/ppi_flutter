@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'globals.dart';
+import 'package:http/http.dart' as http;
 
 class itemPage extends StatefulWidget {
   final Map<String, String> game;
@@ -33,6 +35,24 @@ class _itemPageState extends State<itemPage> {
               Text('Developer: ${game['desarrollador'] ?? 'No developer'}'),
               const SizedBox(height: 8),
               Text('ESRB: ${game['ESRB'] ?? 'No ESRB'}'),
+              const SizedBox(height: 8),
+              ElevatedButton(onPressed: () async {
+                final response = await http.post(
+                Uri.parse('http://localhost:8001/update_cart.php'),
+                body: {
+                  'id_usuario': id_usuario,
+                  'id_juego': game['id_juego']
+                },
+              );
+              if (response.statusCode == 200) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Item added to cart')),
+                );
+              } else {
+                throw Exception('Failed to load history');
+              }
+              }, 
+              child: const Text("Add to cart"))
             ],
           ),
         ),
