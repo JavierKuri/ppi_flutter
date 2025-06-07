@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'catalogue.dart';
 import 'globals.dart';
+import 'signupPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
   } 
-
+     
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: "Correo"
+                    labelText: "Email"
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -92,11 +93,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: "Contraseña"
+                    labelText: "Password"
                   ),
                 ),
                 const SizedBox(height: 50),
                 ElevatedButton(onPressed: login, child: Text("Login")),
+                const SizedBox(height: 50),
+                ElevatedButton(onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => signupPage(title: 'Sign up')),
+                  );
+                }, child: Text("New account")),
               ],
             ),
           ),
