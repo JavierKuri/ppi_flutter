@@ -28,7 +28,7 @@
             $historial[] = $row;
         }
 
-        if (empty($cart)) {
+        if (empty($historial)) {
             echo json_encode([]);
             mysqli_close($con);
             exit;
