@@ -45,7 +45,7 @@ class _cartPageState extends State<cartPage> {
     }
   }
 
-// Function for getting history through PHP API
+// Function for getting cart through PHP API
 Future<List<Map<String, String>>> get_cart() async {
     final response = await http.post(
       Uri.parse('http://localhost:8001/get_cart.php'),
@@ -82,8 +82,32 @@ Future<List<Map<String, String>>> get_cart() async {
           } else {
             final games = snapshot.data!;
             return ListView.builder(
-              itemCount: games.length,
+              itemCount: games.length + 1,
               itemBuilder: (context, index) {
+                if (index == games.length) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final response = await http.post(
+                          Uri.parse('http://localhost:8001/payment.php'),
+                          body: {
+                            'id_usuario': id_usuario,
+                          },
+                        );
+                        if (response.statusCode == 200) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Transaction complete')),
+                          );
+                          setState(() {});
+                        } else {
+                          throw Exception('Failed to complete transaction');
+                        }
+                      },
+                      child: const Text('Proceed to payment'),
+                    ),
+                  );
+                }
                 final game = games[index];
                 return ListTile(
                   title: Text(game['titulo'] ?? 'Untitled'),
