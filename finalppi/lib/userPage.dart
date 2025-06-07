@@ -1,3 +1,4 @@
+import 'package:finalppi/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -91,7 +92,14 @@ Future<Map<String, String>> get_user() async {
                   const SizedBox(height: 16),
                   Text("Date of Birth: ${user['fecha_nacimiento']}"),
                   const SizedBox(height: 16),
-                  Text("Address: ${user['direccion']}")
+                  Text("Address: ${user['direccion']}"),
+                  const SizedBox(height: 16),
+                  ElevatedButton(onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage(title: 'Login')),
+                    );
+                  }, child: const Text("Logout"))
                 ],
               ),
             );
