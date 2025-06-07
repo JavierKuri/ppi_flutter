@@ -1,8 +1,7 @@
+import 'package:finalppi/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'globals.dart';
-import 'catalogue.dart';
 
 class signupPage extends StatefulWidget {
   const signupPage({super.key, required this.title});
@@ -34,12 +33,16 @@ Future<void> signup() async {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['success'] == true) {
-        id_usuario = data['id_usuario'];
         // Navigate to HomeScreen on success
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const catalogue(title: "Game Catalogue")),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Signup succesful. Returning to login page...')),
         );
+        Future.delayed(const Duration(seconds: 3), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHomePage(title: "Login")),
+          );
+        });
       } else {
         // Show login failed message
         ScaffoldMessenger.of(context).showSnackBar(
