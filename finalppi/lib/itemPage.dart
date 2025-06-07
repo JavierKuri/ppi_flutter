@@ -49,7 +49,7 @@ class _itemPageState extends State<itemPage> {
                   const SnackBar(content: Text('Item added to cart')),
                 );
               } else {
-                throw Exception('Failed to load history');
+                throw Exception('Failed to add item');
               }
               }, 
               child: const Text("Add to cart"))

@@ -57,7 +57,7 @@ Future<List<Map<String, String>>> get_cart() async {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => Map<String, String>.from(item)).toList();
     } else {
-      throw Exception('Failed to load history');
+      throw Exception('Failed to load cart');
     }
   }
 
@@ -78,7 +78,7 @@ Future<List<Map<String, String>>> get_cart() async {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No history found.'));
+            return Center(child: Text('No cart found.'));
           } else {
             final games = snapshot.data!;
             return ListView.builder(
@@ -89,6 +89,23 @@ Future<List<Map<String, String>>> get_cart() async {
                   title: Text(game['titulo'] ?? 'Untitled'),
                   subtitle: Text('\$ ${game['precio']}'),
                   leading: Text(game['id_carrito']!),
+                  trailing: ElevatedButton(onPressed: () async {
+                    final response = await http.post(
+                      Uri.parse('http://localhost:8001/delete_cart_item.php'),
+                      body: {
+                        'id_carrito':game['id_carrito']
+                      },
+                    );
+                    if (response.statusCode == 200) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Item deleted from cart')),
+                      );
+                      setState(() {});
+                    } else {
+                      throw Exception('Failed to delete from cart');
+                    }
+                  }, 
+                  child: const Text("Delete from cart"))
                 );
               },
             );
