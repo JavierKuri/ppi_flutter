@@ -44,11 +44,15 @@ class _catalogueState extends State<catalogue> {
       );
     }
   }
+  
+  // For search bar
+  final TextEditingController _searchBarController = TextEditingController();
 
   // Function for getting games through PHP API
-  Future<List<Map<String, String>>> get_games() async {
+  late Future<List<Map<String, String>>> _gamesFuture;
+  Future<List<Map<String, String>>> get_games([String busqueda = '']) async {
     final response = await http.get(
-      Uri.parse('http://localhost:8001/get_games.php')
+      Uri.parse('http://localhost:8001/get_games.php?busqueda=${Uri.encodeComponent(busqueda)}'),
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -58,6 +62,13 @@ class _catalogueState extends State<catalogue> {
     }
   }
 
+  //For preloading data
+  @override
+  void initState() {
+    super.initState();
+    _gamesFuture = get_games();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,33 +76,56 @@ class _catalogueState extends State<catalogue> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-
-      // Get and Show games in ListView
-      body: FutureBuilder<List<Map<String, String>>>(
-        future: get_games(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No games found.'));
-          } else {
-            final games = snapshot.data!;
-            return ListView.builder(
-              itemCount: games.length,
-              itemBuilder: (context, index) {
-                final game = games[index];
-                return ListTile(
-                  title: Text(game['titulo'] ?? 'Untitled'),
-                  subtitle: Text('\$ ${game['precio']}'),
-                  leading: game['portada'] != null ? Image.memory(base64Decode(game['portada']!)) : Icon(Icons.image_not_supported),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => itemPage(game: game)))
-                );
+      // Get and show games
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SearchBar(
+              controller: _searchBarController,
+              hintText: 'Search games...',
+              leading: const Icon(Icons.search),
+              onChanged: (busqueda) {
+                setState(() {
+                  _gamesFuture = get_games(busqueda.trim());
+                });
               },
-            );
-          }
-        },
+            ),
+          ),
+          Expanded( 
+            child: FutureBuilder<List<Map<String, String>>>(
+              future: _gamesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No games found.'));
+                } else {
+                  final games = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: games.length,
+                    itemBuilder: (context, index) {
+                      final game = games[index];
+                      return ListTile(
+                        title: Text(game['titulo'] ?? 'Untitled'),
+                        subtitle: Text('\$ ${game['precio']}'),
+                        leading: game['portada'] != null
+                            ? Image.memory(base64Decode(game['portada']!))
+                            : const Icon(Icons.image_not_supported),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => itemPage(game: game)),
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
 
       // Bottom Nav Bar
