@@ -32,7 +32,7 @@
     }
 
     if (empty($juegos)) {
-        echo json_encode(['message' => 'No rows found']);
+        echo json_encode([]);
         mysqli_close($con);
         exit;
     }
