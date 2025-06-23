@@ -50,9 +50,9 @@ class _catalogueState extends State<catalogue> {
 
   // Function for getting games through PHP API
   late Future<List<Map<String, String>>> _gamesFuture;
-  Future<List<Map<String, String>>> get_games([String busqueda = '']) async {
+  Future<List<Map<String, String>>> get_games([String busqueda = '', String ordenar = 'A-Z']) async {
     final response = await http.get(
-      Uri.parse('http://localhost:8001/get_games.php?busqueda=${Uri.encodeComponent(busqueda)}'),
+      Uri.parse('http://localhost:8001/get_games.php?busqueda=${Uri.encodeComponent(busqueda)}&ordenar=${Uri.encodeComponent(ordenar)}'),
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -69,6 +69,9 @@ class _catalogueState extends State<catalogue> {
     _gamesFuture = get_games();
   }
 
+  //For ordering
+  String _selectedFilter = 'A-Z';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,15 +84,51 @@ class _catalogueState extends State<catalogue> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: SearchBar(
-              controller: _searchBarController,
-              hintText: 'Search games...',
-              leading: const Icon(Icons.search),
-              onChanged: (busqueda) {
-                setState(() {
-                  _gamesFuture = get_games(busqueda.trim());
-                });
-              },
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: SearchBar(
+                    controller: _searchBarController,
+                    hintText: 'Search games...',
+                    leading: const Icon(Icons.search),
+                    onChanged: (busqueda) {
+                      setState(() {
+                        _gamesFuture = get_games(
+                          busqueda.trim(),
+                          _selectedFilter,
+                        );
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedFilter,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Order by',
+                    ),
+                    items: ['A-Z', 'Z-A', 'Price (Desc)', 'Price (Asc)'].map((filter) {
+                      return DropdownMenuItem(
+                        value: filter,
+                        child: Text(filter),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedFilter = value!;
+                        _gamesFuture = get_games(
+                          _searchBarController.text.trim(),
+                          _selectedFilter,
+                        );
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded( 

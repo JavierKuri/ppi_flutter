@@ -75,39 +75,43 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(32),
-        child:
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: "Email"
-                  ),
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child:
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: "Email"
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Password"
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    ElevatedButton(onPressed: login, child: Text("Login")),
+                    const SizedBox(height: 50),
+                    ElevatedButton(onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => signupPage(title: 'Sign up')),
+                      );
+                    }, child: Text("New account")),
+                  ],
                 ),
-                const SizedBox(height: 30),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password"
-                  ),
-                ),
-                const SizedBox(height: 50),
-                ElevatedButton(onPressed: login, child: Text("Login")),
-                const SizedBox(height: 50),
-                ElevatedButton(onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => signupPage(title: 'Sign up')),
-                  );
-                }, child: Text("New account")),
-              ],
-            ),
+              ),
           ),
+        ],
       ),
     );
   }

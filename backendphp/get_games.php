@@ -11,10 +11,27 @@
 
     $juegos = [];
     $busqueda = isset($_GET['busqueda']) ? mysqli_real_escape_string($con, $_GET['busqueda']) : '';
+    $ordenar = isset($_GET['ordenar']) ? mysqli_real_escape_string($con, $_GET['ordenar']) : '';
     if ($busqueda !='') {
-        $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY titulo;";
+        if($ordenar =='Z-A'){
+            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY titulo DESC;";
+        } else if ($ordenar == 'Price (Desc)') {
+            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY precio DESC;";
+        } else if ($ordenar == 'Price (Asc)') {
+            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY precio;";
+        } else {
+            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY titulo;";
+        }
     } else {
-        $sql = "SELECT * FROM juegos ORDER BY titulo;";
+        if($ordenar =='Z-A'){
+            $sql = "SELECT * FROM juegos ORDER BY titulo DESC;";
+        } else if ($ordenar == 'Price (Desc)') {
+            $sql = "SELECT * FROM juegos ORDER BY precio DESC;";
+        } else if ($ordenar == 'Price (Asc)') {
+            $sql = "SELECT * FROM juegos ORDER BY precio;";
+        } else {
+            $sql = "SELECT * FROM juegos ORDER BY titulo;";
+        }
     }
     $result = mysqli_query($con, $sql);
 
