@@ -9,30 +9,37 @@
         exit;
     }
 
-    $juegos = [];
     $busqueda = isset($_GET['busqueda']) ? mysqli_real_escape_string($con, $_GET['busqueda']) : '';
     $ordenar = isset($_GET['ordenar']) ? mysqli_real_escape_string($con, $_GET['ordenar']) : '';
-    if ($busqueda !='') {
-        if($ordenar =='Z-A'){
-            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY titulo DESC;";
-        } else if ($ordenar == 'Price (Desc)') {
-            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY precio DESC;";
-        } else if ($ordenar == 'Price (Asc)') {
-            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY precio;";
-        } else {
-            $sql = "SELECT * FROM juegos WHERE titulo LIKE '%$busqueda%' ORDER BY titulo;";
-        }
-    } else {
-        if($ordenar =='Z-A'){
-            $sql = "SELECT * FROM juegos ORDER BY titulo DESC;";
-        } else if ($ordenar == 'Price (Desc)') {
-            $sql = "SELECT * FROM juegos ORDER BY precio DESC;";
-        } else if ($ordenar == 'Price (Asc)') {
-            $sql = "SELECT * FROM juegos ORDER BY precio;";
-        } else {
-            $sql = "SELECT * FROM juegos ORDER BY titulo;";
-        }
+    $desarrollador = isset($_GET['desarrollador']) ? mysqli_real_escape_string($con, $_GET['desarrollador']) : '';
+
+    // Start base query
+    $sql = "SELECT * FROM juegos WHERE TRUE";
+
+    // Add filters
+    if ($busqueda !== '') {
+        $sql .= " AND titulo LIKE '%$busqueda%'";
     }
+    if ($desarrollador !== '') {
+        $sql .= " AND desarrollador = '$desarrollador'";
+    }
+
+    // Add ordering
+    switch ($ordenar) {
+        case 'Z-A':
+            $sql .= " ORDER BY titulo DESC";
+            break;
+        case 'Price (Desc)':
+            $sql .= " ORDER BY precio DESC";
+            break;
+        case 'Price (Asc)':
+            $sql .= " ORDER BY precio";
+            break;
+        default:
+            $sql .= " ORDER BY titulo";
+            break;
+    }
+
     $result = mysqli_query($con, $sql);
 
     if (!$result) {
@@ -41,17 +48,12 @@
         exit;
     }
 
+    $juegos = [];
     while ($row = mysqli_fetch_assoc($result)) {
         if (isset($row['portada'])) {
             $row['portada'] = base64_encode($row['portada']);
         }
         $juegos[] = $row;
-    }
-
-    if (empty($juegos)) {
-        echo json_encode([]);
-        mysqli_close($con);
-        exit;
     }
 
     echo json_encode($juegos);
