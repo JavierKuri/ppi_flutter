@@ -49,9 +49,9 @@ class _catalogueState extends State<catalogue> {
 
   // Function for getting games through PHP API
   late Future<List<Map<String, String>>> _gamesFuture;
-  Future<List<Map<String, String>>> get_games([String busqueda = '', String ordenar = 'A-Z', String desarrollador = '']) async {
+  Future<List<Map<String, String>>> get_games([String busqueda = '', String ordenar = 'A-Z', String desarrollador = '', String rating = '']) async {
     final response = await http.get(
-      Uri.parse('http://localhost:8001/get_games.php?busqueda=${Uri.encodeComponent(busqueda)}&ordenar=${Uri.encodeComponent(ordenar)}&desarrollador=${Uri.encodeComponent(desarrollador)}'),
+      Uri.parse('http://localhost:8001/get_games.php?busqueda=${Uri.encodeComponent(busqueda)}&ordenar=${Uri.encodeComponent(ordenar)}&desarrollador=${Uri.encodeComponent(desarrollador)}&rating=${Uri.encodeComponent(rating)}'),
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -67,6 +67,7 @@ class _catalogueState extends State<catalogue> {
     super.initState();
     _gamesFuture = get_games();
     _developersFuture = get_developers();
+    _ratingsFuture = get_ratings();
   }
 
   //For ordering
@@ -86,9 +87,23 @@ class _catalogueState extends State<catalogue> {
     }
   }
 
+  //Function for getting list of distinct ESRB ratings
+  late Future<List<Map<String, String>>> _ratingsFuture;
+  Future<List<Map<String, String>>> get_ratings() async {
+    final response = await http.get(
+      Uri.parse('http://localhost:8001/get_ratings.php'),
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((item) => Map<String, String>.from(item)).toList();
+    } else {
+      throw Exception('Failed to load ratings');
+    }
+  }
+
   //For filtering
   String _selectedDeveloper = '';
-  String _selectedRating = 'All';
+  String _selectedRating = '';
 
   //Build method
   @override
@@ -143,6 +158,7 @@ class _catalogueState extends State<catalogue> {
                                 _searchBarController.text.trim(),
                                 _selectedFilter,
                                 _selectedDeveloper,
+                                _selectedRating
                               );
                             });
                           },
@@ -160,6 +176,7 @@ class _catalogueState extends State<catalogue> {
                                   _searchBarController.text.trim(),
                                   _selectedFilter,
                                   _selectedDeveloper,
+                                  _selectedRating
                                 );
                               });
                             },
@@ -172,9 +189,74 @@ class _catalogueState extends State<catalogue> {
               ],
             ),
             const SizedBox(height: 16),
+
             ExpansionTile(
-              title: const Text("ESRB")
+              title: const Text("ESRB rating"),
+              children: [
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _ratingsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('No ESRB ratings found found.'),
+                      );
+                    }
+                    final ratings = snapshot.data!;
+                    return Column(
+                      children: [
+                        RadioListTile(
+                          title: const Text('Any rating'),
+                          value: '',
+                          groupValue: _selectedRating,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRating = value!;
+                              _gamesFuture = get_games(
+                                _searchBarController.text.trim(),
+                                _selectedFilter,
+                                _selectedDeveloper,
+                                _selectedRating
+                              );
+                            });
+                          },
+                        ),
+                        ...ratings.map((rating) {
+                          final ratingLetter = rating['ESRB'] ?? '';
+                          return RadioListTile(
+                            title: Text(ratingLetter),
+                            value: ratingLetter,
+                            groupValue: _selectedRating,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedRating = value!;
+                                _gamesFuture = get_games(
+                                  _searchBarController.text.trim(),
+                                  _selectedFilter,
+                                  _selectedDeveloper,
+                                  _selectedRating
+                                );
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
+
             const SizedBox(height: 16),
           ],
         ),
@@ -198,7 +280,8 @@ class _catalogueState extends State<catalogue> {
                         _gamesFuture = get_games(
                           busqueda.trim(),
                           _selectedFilter,
-                          _selectedDeveloper
+                          _selectedDeveloper,
+                          _selectedRating
                         );
                       });
                     },
@@ -225,7 +308,8 @@ class _catalogueState extends State<catalogue> {
                         _gamesFuture = get_games(
                           _searchBarController.text.trim(),
                           _selectedFilter,
-                          _selectedDeveloper
+                          _selectedDeveloper,
+                          _selectedRating
                         );
                       });
                     },

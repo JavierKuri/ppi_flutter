@@ -12,6 +12,7 @@
     $busqueda = isset($_GET['busqueda']) ? mysqli_real_escape_string($con, $_GET['busqueda']) : '';
     $ordenar = isset($_GET['ordenar']) ? mysqli_real_escape_string($con, $_GET['ordenar']) : '';
     $desarrollador = isset($_GET['desarrollador']) ? mysqli_real_escape_string($con, $_GET['desarrollador']) : '';
+    $rating = isset($_GET['rating']) ? mysqli_real_escape_string($con, $_GET['rating']) : '';
 
     // Start base query
     $sql = "SELECT * FROM juegos WHERE TRUE";
@@ -22,6 +23,9 @@
     }
     if ($desarrollador !== '') {
         $sql .= " AND desarrollador = '$desarrollador'";
+    }
+    if ($rating !== '') {
+        $sql .= " AND ESRB = '$rating'";
     }
 
     // Add ordering
