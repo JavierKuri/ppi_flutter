@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(onPressed: login, child: Text("Login")),
                     const SizedBox(height: 50),
                     ElevatedButton(onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => signupPage(title: 'Sign up')),
                       );
